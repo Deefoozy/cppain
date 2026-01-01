@@ -5,6 +5,7 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
+#include <cstdlib>
 #include <iostream>
 
 class VisApp {
@@ -30,11 +31,14 @@ private:
 
   void createWindow() {
     if (*this->hasWindow) {
-      return;
+      glfwDestroyWindow(this->windows);
+
+      *this->hasWindow = false;
     }
 
     if (!*this->glfwIsReady) {
       glfwInit();
+
       *this->glfwIsReady = true;
     }
 
@@ -55,7 +59,6 @@ private:
 
   void cleanup() {
     glfwDestroyWindow(this->windows);
-
     glfwTerminate();
   }
 };
@@ -63,7 +66,14 @@ private:
 int main() {
   VisApp mainApplication;
 
-  mainApplication.run();
+  try {
+    mainApplication.run();
+    // wtf does that & do
+  } catch (const std::exception &e) {
+    std::cerr << e.what() << std::endl;
 
-  return 0;
+    return EXIT_FAILURE;
+  }
+
+  return EXIT_SUCCESS;
 }
