@@ -1,1 +1,11 @@
 cmake-build-debug/*
+
+.vscode
+.idea
+
+cppain
+Makefile
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles/*
+_deps/*
