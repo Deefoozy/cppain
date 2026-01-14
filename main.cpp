@@ -8,65 +8,12 @@
 #include <cstdlib>
 #include <iostream>
 
-class VisApp {
-public:
-  void run() {
-    // TODO: make myself very happy by also doing this shit multi threaded
-    createWindow();
-
-    mainLoop();
-
-    cleanup();
-  }
-
-private:
-  bool hasWindow_val = false;
-  bool *hasWindow = &hasWindow_val;
-
-  bool glfwIsReady_val = false;
-  bool *glfwIsReady = &glfwIsReady_val;
-
-  // hehe
-  GLFWwindow *windows;
-
-  void createWindow() {
-    if (*this->hasWindow) {
-      glfwDestroyWindow(this->windows);
-
-      *this->hasWindow = false;
-    }
-
-    if (!*this->glfwIsReady) {
-      glfwInit();
-
-      *this->glfwIsReady = true;
-    }
-
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    this->windows =
-        glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
-
-    *this->hasWindow = true;
-  }
-
-  void mainLoop() {
-    std::cout << "Hello, World!" << std::endl;
-
-    while (!glfwWindowShouldClose(this->windows)) {
-      glfwPollEvents();
-    }
-  }
-
-  void cleanup() {
-    glfwDestroyWindow(this->windows);
-    glfwTerminate();
-  }
-};
+#include "classes/VisApp.h"
 
 int main() {
-  VisApp mainApplication;
-
   try {
+    VisApp mainApplication;
+
     mainApplication.run();
     // wtf does that & do
   } catch (const std::exception &e) {
