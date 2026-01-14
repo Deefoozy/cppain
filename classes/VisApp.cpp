@@ -18,23 +18,18 @@ void VisApp::run() {
 }
 
 void VisApp::createWindow() {
-  if (*this->hasWindow) {
-    glfwDestroyWindow(this->windows);
+  glfwInit();
 
-    *this->hasWindow = false;
-  }
+  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API); // Do not open with OpenGL
+  glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-  if (!*this->glfwIsReady) {
-    glfwInit();
-
-    *this->glfwIsReady = true;
-  }
-
-  glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-  this->windows =
-      glfwCreateWindow(800, 600, "Vulkan window", nullptr, nullptr);
-
-  *this->hasWindow = true;
+  this->windows = glfwCreateWindow(
+    800,
+    600,
+    "Vulkan window",
+    nullptr,
+    nullptr // OpenGL specific
+  );
 }
 
 void VisApp::mainLoop() const {
