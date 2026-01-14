@@ -5,9 +5,12 @@ class VisApp {
 public:
   void run();
 private:
+  VkInstance instance = nullptr;
   GLFWwindow *windows = nullptr;
 
   void createWindow();
+
+  void initVulkan();
 
   void mainLoop() const;
 
