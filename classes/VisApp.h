@@ -1,5 +1,3 @@
-#include <vector>
-
 #ifndef CPPAIN_VISAPP_H
 #define CPPAIN_VISAPP_H
 
@@ -20,8 +18,6 @@ private:
   void mainLoop() const;
 
   void cleanup() const;
-
-  static bool checkValidationLayerSupport();
 };
 
 #endif //CPPAIN_VISAPP_H

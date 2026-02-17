@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(
     cppain main.cpp
+    classes/PhysicalD.cpp
     classes/VisApp.cpp
 )
 
