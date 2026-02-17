@@ -5,7 +5,10 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
+#include <cstring>
+#include <vector>
 #include <iostream>
+#include <span>
 
 #include "VisApp.h"
 
@@ -13,6 +16,8 @@ void VisApp::run() {
   createWindow();
 
   initVulkan();
+
+  assignPhysicalDevice();
 
   mainLoop();
 
@@ -32,6 +37,82 @@ void VisApp::createWindow() {
     nullptr,
     nullptr // OpenGL specific
   );
+}
+
+void VisApp::assignPhysicalDevice() {
+  uint32_t deviceCount = 0;
+
+  // should write another class to interface with certain vulkan systems. these vkresult checks don't need to be handled here
+  VkResult statusa = vkEnumeratePhysicalDevices(
+    this->instance,
+    &deviceCount,
+    nullptr
+  );
+
+  if (statusa != VK_SUCCESS) {
+    std::cout << "Encountered issue while getting device_count. status code: " << statusa << std::endl;
+
+    throw std::runtime_error("Encountered issue while getting device_count.");
+  }
+
+  std::cout << "Physical Vulkan device count: " << deviceCount << std::endl;
+
+  std::vector<VkPhysicalDevice> devices(deviceCount);
+
+  VkResult statusb = vkEnumeratePhysicalDevices(
+    this->instance,
+    &deviceCount,
+    devices.data()
+  );
+
+  if (statusb != VK_SUCCESS) {
+    std::cout << "Encountered issue while getting device_count. status code: " << statusb << std::endl;
+
+    throw std::runtime_error("Encountered issue while getting device_count.");
+  }
+
+  if (deviceCount == 0) {
+    throw std::runtime_error("No (physical) Vulkan devices found");
+  }
+
+  // Should be moved to separate helper function
+  for (const VkPhysicalDevice& device : devices) {
+    VkPhysicalDeviceProperties properties;
+    VkPhysicalDeviceFeatures features;
+
+    vkGetPhysicalDeviceProperties(
+      device,
+      &properties
+    );
+
+    vkGetPhysicalDeviceFeatures(
+      device,
+      &features
+    );
+
+    std::cout << "Device name: " << properties.deviceName << std::endl;
+
+    if (
+      properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ||
+      properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU
+    ) {
+      std::cout << "Device is the right type (either a physical or integrated GPU)" << std::endl;
+
+      if (features.geometryShader) {
+        std::cout << "Device has a geometry shader" << std::endl;
+
+        this->physicalDevice = device;
+
+        // TODO: Implement settings. might want to use this code for other vulkan implementations other than testing.
+        // Don't want to do file anything rn though, fukdat
+        break;
+      }
+    }
+
+    if (this->physicalDevice == VK_NULL_HANDLE) {
+      throw std::runtime_error("Couldn't find a usable GPU, integrated or dedicated");
+    }
+  }
 }
 
 void VisApp::initVulkan() {
@@ -54,15 +135,13 @@ void VisApp::initVulkan() {
   uint32_t glfwExtensionCount = 0;
 
   // Seems like a pointer to a pointer.
-  const char **glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
+  const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
   createInfo.enabledExtensionCount = glfwExtensionCount;
   createInfo.ppEnabledExtensionNames = glfwExtensions;
 
-  // Something validation. we don't need that shit here.
   createInfo.enabledLayerCount = 0;
 
-  const VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
+  const VkResult result = vkCreateInstance(&createInfo, nullptr, &this->instance);
 
   if (result != VK_SUCCESS) {
     std::cout << "cry." << std::endl;
