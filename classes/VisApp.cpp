@@ -50,10 +50,6 @@ void VisApp::assignPhysicalDevice() {
   PhysicalD::getPhysicalDs(this->instance, devices);
 
   PhysicalD::selectDevice(this->physicalDevice, devices);
-
-  if (this->physicalDevice == VK_NULL_HANDLE) {
-    throw std::runtime_error("Couldn't find a usable GPU, integrated or dedicated");
-  }
 }
 
 void VisApp::initVulkan() {

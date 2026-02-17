@@ -85,6 +85,12 @@ void PhysicalD::selectDevice(VkPhysicalDevice& physicalDevice, std::vector<VkPhy
   for (const VkPhysicalDevice& device : physicalDs) {
     if (deviceIsViable(device)) {
       physicalDevice = device;
+
+      return;
     }
+  }
+
+  if (physicalDevice == VK_NULL_HANDLE) {
+    throw std::runtime_error("Couldn't find a usable GPU, integrated or dedicated");
   }
 }
