@@ -60,7 +60,7 @@ void VisApp::createDevice() {
   LogicalD::createDevice(
     this->physicalDevice,
     this->queueIndex,
-    &this->device
+    this->device
   );
 }
 

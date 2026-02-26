@@ -10,7 +10,7 @@
 void LogicalD::createDevice(
   const VkPhysicalDevice &physicalDevice,
   const QueueFamilyIndex &queueIndex,
-  VkDevice *device
+  VkDevice& device
 ) {
   constexpr float queuePriority = 1.0f;
 
@@ -41,7 +41,7 @@ void LogicalD::createDevice(
   deviceCreateInfo.enabledExtensionCount = 0;
   deviceCreateInfo.enabledLayerCount = 0;
 
-  if (vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, device) != VK_SUCCESS) {
+  if (vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &device) != VK_SUCCESS) {
     throw std::runtime_error("Couldn't create logical D");
   }
 }
