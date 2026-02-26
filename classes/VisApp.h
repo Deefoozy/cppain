@@ -7,13 +7,16 @@ class VisApp {
 public:
   void run();
 private:
-  VkInstance instance = nullptr;
+  QueueFamilyIndex queueIndex {};
+
   GLFWwindow* windows = nullptr;
+
+  VkInstance instance = nullptr;
   VkDevice device = nullptr;
   VkQueue graphicsQueue = nullptr;
-
-  VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-  QueueFamilyIndex queueIndex {};
+  VkQueue presentQueue = nullptr;
+  VkSurfaceKHR surface = nullptr;
+  VkPhysicalDevice physicalDevice = nullptr;
 
   void createWindow();
 
@@ -23,7 +26,9 @@ private:
 
   void createDevice();
 
-  void getQueue();
+  void getQueues();
+
+  void createSurface();
 
   void mainLoop() const;
 

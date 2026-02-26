@@ -14,10 +14,11 @@ void VisApp::run() {
   createWindow();
 
   initVulkan();
+  createSurface();
 
   assignPhysicalDevice();
   createDevice();
-  getQueue();
+  getQueues();
 
   mainLoop();
 
@@ -54,7 +55,7 @@ void VisApp::assignPhysicalDevice() {
 }
 
 void VisApp::createDevice() {
-  Queue::getQueueFamilies(this->physicalDevice, this->queueIndex);
+  Queue::getQueueFamilies(this->physicalDevice, this->queueIndex, this->surface);
 
   LogicalD::createDevice(
     this->physicalDevice,
@@ -63,13 +64,33 @@ void VisApp::createDevice() {
   );
 }
 
-void VisApp::getQueue() {
+void VisApp::getQueues() {
   vkGetDeviceQueue(
     this->device,
     this->queueIndex.graphicsFamily.value(),
     0,
     &this->graphicsQueue
   );
+
+  vkGetDeviceQueue(
+    this->device,
+    this->queueIndex.presentFamily.value(),
+    0,
+    &this->presentQueue
+  );
+}
+
+void VisApp::createSurface() {
+  const VkResult status = glfwCreateWindowSurface(
+    this->instance,
+    this->windows,
+    nullptr,
+    &this->surface
+  );
+
+  if (status != VK_SUCCESS) {
+    throw std::runtime_error("Couldn't create surface using glfwCreateWindowSurface");
+  }
 }
 
 void VisApp::initVulkan() {
@@ -117,6 +138,7 @@ void VisApp::mainLoop() const {
 
 void VisApp::cleanup() const {
   vkDestroyDevice(this->device, nullptr);
+  vkDestroySurfaceKHR(this->instance, this->surface, nullptr);
   vkDestroyInstance(this->instance, nullptr);
 
   glfwDestroyWindow(this->windows);

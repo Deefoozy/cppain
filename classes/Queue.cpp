@@ -7,11 +7,13 @@
 
 #include "Queue.h"
 
-void Queue::getQueueFamilies(const VkPhysicalDevice & device, QueueFamilyIndex& index) {
+void Queue::getQueueFamilies(const VkPhysicalDevice& device, QueueFamilyIndex& index, const VkSurfaceKHR& surface) {
   const uint32_t queueFamilyCount = getQueueFamilyCount(device);
 
   std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
   getQueueFamilyProperties(device, queueFamilyCount, queueFamilies);
+
+  bool queuesCompleted = false;
 
   int idx = 0;
   for (const VkQueueFamilyProperties& queueFamily : queueFamilies) {
@@ -19,14 +21,30 @@ void Queue::getQueueFamilies(const VkPhysicalDevice & device, QueueFamilyIndex& 
       index.graphicsFamily = idx;
     }
 
+    // No fkn way this means a 32 bit boolean. TODO: READ DOCS
+    VkBool32 presentSupport;
+
+    vkGetPhysicalDeviceSurfaceSupportKHR(
+      device,
+      idx,
+      surface,
+      &presentSupport
+    );
+
+    if (presentSupport) {
+      index.presentFamily = idx;
+    }
+
     if (index.isComplete()) {
+      queuesCompleted = true;
+
       break;
     }
 
     idx++;
   }
 
-  if (!index.isComplete()) {
+  if (!queuesCompleted) {
     throw std::runtime_error("Didn't find all required queue indexes");
   }
 }
