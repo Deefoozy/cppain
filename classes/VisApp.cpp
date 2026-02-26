@@ -1,14 +1,13 @@
 #include <vulkan/vulkan_core.h>
-#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
 #include <vector>
 #include <iostream>
 
 #include "PhysicalD.h"
+#include "LogicalD.h"
+#include "Queue.h"
+
 #include "VisApp.h"
 
 void VisApp::run() {
@@ -17,6 +16,8 @@ void VisApp::run() {
   initVulkan();
 
   assignPhysicalDevice();
+  createDevice();
+  getQueue();
 
   mainLoop();
 
@@ -47,9 +48,28 @@ void VisApp::assignPhysicalDevice() {
 
   std::vector<VkPhysicalDevice> devices(deviceCount);
 
-  PhysicalD::getPhysicalDs(this->instance, devices);
+  PhysicalD::getPhysicalDs(this->instance, deviceCount, devices);
 
   PhysicalD::selectDevice(this->physicalDevice, devices);
+}
+
+void VisApp::createDevice() {
+  Queue::getQueueFamilies(this->physicalDevice, this->queueIndex);
+
+  LogicalD::createDevice(
+    this->physicalDevice,
+    this->queueIndex,
+    &this->device
+  );
+}
+
+void VisApp::getQueue() {
+  vkGetDeviceQueue(
+    this->device,
+    this->queueIndex.graphicsFamily.value(),
+    0,
+    &this->graphicsQueue
+  );
 }
 
 void VisApp::initVulkan() {
@@ -96,7 +116,8 @@ void VisApp::mainLoop() const {
 }
 
 void VisApp::cleanup() const {
-  vkDestroyInstance(instance, nullptr);
+  vkDestroyDevice(this->device, nullptr);
+  vkDestroyInstance(this->instance, nullptr);
 
   glfwDestroyWindow(this->windows);
   glfwTerminate();

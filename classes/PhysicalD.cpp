@@ -1,9 +1,5 @@
 #include <vulkan/vulkan_core.h>
 #define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
 #include <vector>
 #include <iostream>
@@ -13,8 +9,7 @@
 uint32_t PhysicalD::getPhysicalDCount(const VkInstance& instance) {
   uint32_t deviceCount = 0;
 
-  // should write another class to interface with certain vulkan systems. these vkresult checks don't need to be handled here
-  VkResult status = vkEnumeratePhysicalDevices(
+  const VkResult status = vkEnumeratePhysicalDevices(
     instance,
     &deviceCount,
     nullptr
@@ -29,12 +24,10 @@ uint32_t PhysicalD::getPhysicalDCount(const VkInstance& instance) {
   return deviceCount;
 }
 
-uint32_t PhysicalD::getPhysicalDs(const VkInstance& instance, std::vector<VkPhysicalDevice>& physicalDs) {
-  uint32_t deviceCount = PhysicalD::getPhysicalDCount(instance);
-
+uint32_t PhysicalD::getPhysicalDs(const VkInstance& instance, uint32_t deviceCount, std::vector<VkPhysicalDevice>& physicalDs) {
   std::cout << "Physical Vulkan device count: " << deviceCount << std::endl;
 
-  VkResult status = vkEnumeratePhysicalDevices(
+  const VkResult status = vkEnumeratePhysicalDevices(
     instance,
     &deviceCount,
     physicalDs.data()
