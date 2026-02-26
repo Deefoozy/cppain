@@ -23,7 +23,6 @@ void Queue::getQueueFamilies(const VkPhysicalDevice& device, QueueFamilyIndex& i
 
     // No fkn way this means a 32 bit boolean. TODO: READ DOCS
     VkBool32 presentSupport;
-
     vkGetPhysicalDeviceSurfaceSupportKHR(
       device,
       idx,
